@@ -60,7 +60,7 @@ def _write_run(root, run_id, role, protocol, rows):
             "temperature_C": 25.0}
     (run_dir / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     with (run_dir / "injections.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(["injection", "volume_uL", "heat_uJ"])
         for idx, (volume, heat) in enumerate(rows, start=1):
             writer.writerow([idx, f"{volume:.2f}", f"{heat:.4f}"])
