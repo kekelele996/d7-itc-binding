@@ -61,18 +61,31 @@ def _open_permissions(root):
         path.chmod(0o755 if path.is_dir() else 0o644)
 
 
-def analyse(kind, index):
-    """造一个隐藏批次，跑候选，返回 (输出 JSON, 期望参数)。"""
+def prepare_batch(kind, index):
+    """造一个隐藏批次，返回 (工作目录, 批次目录, 期望参数)。"""
     workdir = Path(tempfile.mkdtemp(prefix="itc-"))
     batch_id, expected = gen_itc.build_batch(kind, index, workdir)
     root = workdir / batch_id
     _open_permissions(workdir)
     _open_permissions(root)
+    return workdir, root, expected
+
+
+def analyse(kind, index):
+    """造一个隐藏批次，跑候选，返回 (输出 JSON, 期望参数)。"""
+    workdir, root, expected = prepare_batch(kind, index)
     proc = run_candidate(root)
-    result = {"returncode": proc.returncode, "stdout": proc.stdout}
+    stdout = proc.stdout
+    code = proc.returncode
     shutil.rmtree(workdir, ignore_errors=True)
-    assert result["returncode"] == 0, f"退出码 {result['returncode']}"
-    return json.loads(result["stdout"]), expected
+    assert code == 0, f"退出码 {code}"
+    return json.loads(stdout), expected
+
+
+def snapshot(root):
+    """批次目录的清单与字节数，用来核对候选没有往里写东西。"""
+    return sorted((str(path.relative_to(root)), path.stat().st_size)
+                  for path in root.rglob("*") if path.is_file())
 
 
 def relative_error(got, expected, key):
@@ -92,6 +105,39 @@ def test_wrong_argument_count_exits_2():
     proc = run_candidate()
     assert proc.returncode == 2
     assert proc.stdout.strip() == ""
+
+
+def test_output_is_one_json_line():
+    """「标准输出一个 JSON 对象，只有四个字段」"""
+    workdir, root, _ = prepare_batch("dh", 0)
+    proc = run_candidate(root)
+    shutil.rmtree(workdir, ignore_errors=True)
+    assert proc.returncode == 0
+    assert proc.stdout.endswith("\n")
+    assert proc.stdout.count("\n") == 1
+    assert isinstance(json.loads(proc.stdout), dict)
+
+
+def test_does_not_write_into_batch_dir():
+    """「只读批次目录，不往里面写文件」"""
+    workdir, root, _ = prepare_batch("dh", 1)
+    before = snapshot(root)
+    proc = run_candidate(root)
+    after = snapshot(root)
+    shutil.rmtree(workdir, ignore_errors=True)
+    assert proc.returncode == 0
+    assert before == after
+
+
+def test_repeated_run_is_stable():
+    """「同一份输入重复执行，结果一致」"""
+    workdir, root, _ = prepare_batch("n", 2)
+    first = run_candidate(root)
+    second = run_candidate(root)
+    shutil.rmtree(workdir, ignore_errors=True)
+    assert first.returncode == 0
+    assert second.returncode == 0
+    assert first.stdout == second.stdout
 
 
 # ---------- 难点 1：混合热与空白滴定 ----------

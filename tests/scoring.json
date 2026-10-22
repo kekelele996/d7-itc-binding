@@ -2,7 +2,10 @@
   "schema_version": 1,
   "gate_tests": [
     "test_outputs.py::test_prints_json_object",
-    "test_outputs.py::test_wrong_argument_count_exits_2"
+    "test_outputs.py::test_wrong_argument_count_exits_2",
+    "test_outputs.py::test_output_is_one_json_line",
+    "test_outputs.py::test_does_not_write_into_batch_dir",
+    "test_outputs.py::test_repeated_run_is_stable"
   ],
   "tests": {
     "test_outputs.py::test_enthalpy_batch1": {"weight": 0.12, "rationale": "难点1 混合热与空白滴定：焓变是复检单最直接的申报量，扣掉混合热才准，难点合计 0.36"},
