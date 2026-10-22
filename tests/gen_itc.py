@@ -75,15 +75,16 @@ def _dh_batch(system, seed):
     syringe = 2.5 * cell * 800.0 / sum(volumes)
     sample = {"cell_volume_uL": 800.0, "cell_concentration_M": cell,
               "syringe_concentration_M": syringe, "volumes_uL": volumes}
-    blank = dict(sample, cell_concentration_M=0.0)
+    blank_volumes = [1.0] * 10
+    blank = dict(sample, cell_concentration_M=0.0, volumes_uL=blank_volumes)
     return ([("S1", "sample", sample, simulate_heats(system, sample, DILUTION_DH, NOISE_UI, rng))],
             [("B1", "blank", blank,
-              [(v, DILUTION_DH * v + rng.gauss(0.0, NOISE_UI)) for v in volumes])])
+              [(v, DILUTION_DH * v + rng.gauss(0.0, NOISE_UI)) for v in blank_volumes])])
 
 
 def _n_batch(system, seed):
     rng = random.Random(seed)
-    volumes = [2.0] * 25
+    volumes = [2.4] * 30
     cell = 6.0e-5
     syringe = 2.5 * cell * 200.0 / sum(volumes)
     sample = {"cell_volume_uL": 200.0, "cell_concentration_M": cell,
@@ -99,8 +100,9 @@ def _bad_batch(system, seed):
     sample = {"cell_volume_uL": 1000.0, "cell_concentration_M": cell,
               "syringe_concentration_M": syringe, "volumes_uL": volumes}
     rows = simulate_heats(system, sample, 0.0, 0.15, rng)
-    rows[7] = (rows[7][0], rows[7][1] + 20.0)   # 进样气泡
-    rows[15] = (rows[15][0], rows[15][1] + 9.0)  # 溅射
+    rows[7] = (rows[7][0], rows[7][1] + 18.0)    # 进样气泡
+    rows[12] = (rows[12][0], rows[12][1] - 7.0)  # 溅射漏液
+    rows[17] = (rows[17][0], rows[17][1] + 10.0)  # 二次气泡
     return ([("S1", "sample", sample, rows)], [])
 
 
