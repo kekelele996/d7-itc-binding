@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "gate_tests": [
+    "test_outputs.py::test_prints_json_object",
+    "test_outputs.py::test_wrong_argument_count_exits_2"
+  ],
+  "tests": {
+    "test_outputs.py::test_enthalpy_batch1": {"weight": 0.12, "rationale": "难点1 混合热与空白滴定：焓变是复检单最直接的申报量，扣掉混合热才准，难点合计 0.36"},
+    "test_outputs.py::test_enthalpy_batch2": {"weight": 0.12, "rationale": "难点1 混合热与空白滴定：换一个体系确认不是只对单组参数成立"},
+    "test_outputs.py::test_enthalpy_batch3": {"weight": 0.12, "rationale": "难点1 混合热与空白滴定：第三个体系，注射体积不等，混合热按体积变"},
+    "test_outputs.py::test_stoichiometry_batch1": {"weight": 0.11, "rationale": "难点2 池体积置换：长滴定里池内物质被逐步带走，化学计量比最敏感，难点合计 0.33"},
+    "test_outputs.py::test_stoichiometry_batch2": {"weight": 0.11, "rationale": "难点2 池体积置换：换一个体系确认置换建模不是只对单组成立"},
+    "test_outputs.py::test_stoichiometry_batch3": {"weight": 0.11, "rationale": "难点2 池体积置换：第三个体系，结合位点数偏低"},
+    "test_outputs.py::test_abnormal_injections_batch1": {"weight": 0.10, "rationale": "难点3 异常注射点稳健性：一次合格复检不能因为两个坏针把三个量一起带偏，难点合计 0.31"},
+    "test_outputs.py::test_abnormal_injections_batch2": {"weight": 0.10, "rationale": "难点3 异常注射点稳健性：换一个体系确认稳健性不是只对单组成立"},
+    "test_outputs.py::test_abnormal_injections_batch3": {"weight": 0.11, "rationale": "难点3 异常注射点稳健性：第三个体系，结合较强、异常点造成的偏差更大"}
+  }
+}
